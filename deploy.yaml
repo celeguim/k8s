@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jvminfo-service
+  labels:
+    app: jvminfo-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: NodePort
+  selector:
+    app: jvminfo-pod
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: jvminfo-replica
+  labels:
+    app: jvminfo-replica
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: jvminfo-pod
+    spec:
+      containers:
+      - name: jvminfo-container
+        image: celeguim/jvminfo
+        ports:
+        - containerPort: 8080
