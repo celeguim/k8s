@@ -20,6 +20,10 @@ kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER INFO;
 for x in $(seq 0 5); do echo "redis-cluster-$x"; kubectl exec redis-cluster-$x -- redis-cli role; echo; done
 
 
-test
+Test
+kubectl apply -f test-redis.yaml
 
-pip install setuptools
+Destroy:
+kubectl delete -f test-redis.yaml
+kubectl delete -f statefulset.yaml
+for x in $(seq 0 5); do kubectl delete -f pvc-redis0${x}.yaml; done;
