@@ -1,0 +1,25 @@
+kubectl exec -it redis-cluster-0 \
+    -- redis-cli --cluster create \
+    --cluster-replicas 1 $(kubectl get pods -l app=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 {end}')
+
+[ERR] Node 10.1.1.11:6379 is not empty. Either the node already knows other nodes (check with CLUSTER NODES) or contains some key in database 0.
+
+kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER RESET hard;
+kubectl exec -it redis-cluster-1 -- redis-cli CLUSTER RESET hard;
+kubectl exec -it redis-cluster-2 -- redis-cli CLUSTER RESET hard;
+kubectl exec -it redis-cluster-3 -- redis-cli CLUSTER RESET hard;
+kubectl exec -it redis-cluster-4 -- redis-cli CLUSTER RESET hard;
+kubectl exec -it redis-cluster-5 -- redis-cli CLUSTER RESET hard;
+
+kubectl exec -it redis-cluster-0 -- redis-cli FLUSHALL;
+
+kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER NODES;
+
+kubectl exec -it redis-cluster-0 -- redis-cli CLUSTER INFO;
+
+for x in $(seq 0 5); do echo "redis-cluster-$x"; kubectl exec redis-cluster-$x -- redis-cli role; echo; done
+
+
+test
+
+pip install setuptools

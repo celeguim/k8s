@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hit-counter-service
+spec:
+  type: NodePort
+  ports:
+    - port: 8088
+      protocol: TCP
+      targetPort: 5000
+      nodePort: 31005
+  selector:
+    app: hit-counter-app
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hit-counter-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hit-counter-app
+  template:
+    metadata:
+      labels:
+        app: hit-counter-app
+    spec:
+      containers:
+        - name: hit-counter-app
+          image: redis-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 400m
+              memory: 400Mi
