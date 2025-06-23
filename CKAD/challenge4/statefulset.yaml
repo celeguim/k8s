@@ -3,12 +3,15 @@ kind: StatefulSet
 
 metadata:
   name: redis-cluster
+  labels:
+    app: redis-cluster
 
 spec:
+  serviceName: redis-cluster-service
   selector:
     matchLabels:
       app: redis-cluster
-  serviceName: redis-cluster
+
   replicas: 6
 
   template:
@@ -19,15 +22,12 @@ spec:
     spec:
       containers:
         - name: redis
-          # command: ["/conf/update-node.sh", "redis-server", "/conf/redis.conf"]
           command: ["redis-server", "/conf/redis.conf"]
 
           image: redis:5.0.1-alpine
           ports:
             - containerPort: 6379
               name: client
-            - containerPort: 16379
-              name: gossip
 
           env:
             - name: POD_IP
@@ -57,3 +57,17 @@ spec:
         resources:
           requests:
             storage: 1Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-service
+spec:
+  clusterIP: None
+  selector:
+    app: redis-cluster
+  ports:
+    - port: 6379
+      name: redis-cluster
+  publishNotReadyAddresses: true

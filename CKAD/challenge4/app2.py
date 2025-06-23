@@ -1,12 +1,12 @@
-import rediscluster
-from rediscluster import RedisCluster
 import time
 from flask import Flask
 
+from rediscluster import RedisCluster
+
 startup_nodes = [
-    {'host': "10.1.1.11", 'port': 6379},
-    {'host': "10.1.1.12", 'port': 6379},
-    {'host': "10.1.1.13", 'port': 6379},
+    {'host': "redis-cluster-0.redis-cluster-service.default.svc.cluster.local", 'port': 6379},
+    {'host': "redis-cluster-1.redis-cluster-service.default.svc.cluster.local", 'port': 6379},
+    {'host': "redis-cluster-2.redis-cluster-service.default.svc.cluster.local", 'port': 6379},
 ]
 
 redis_cluster = RedisCluster(startup_nodes=startup_nodes)

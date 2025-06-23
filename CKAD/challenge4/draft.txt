@@ -1,3 +1,19 @@
+# create dir for hostpath
+for x in $(seq 0 5); do mkdir /tmp/redis-${x}/; done;
+
+# create pv
+for x in $(seq 0 5); do kubectl apply -f pv-redis${x}.yaml; done;
+
+# create pvc
+for x in $(seq 0 5); do kubectl apply -f pvc-redis${x}.yaml; done;
+
+# config map
+kubectl apply -f configmap.yaml 
+
+# deploy cluster
+kubectl apply -f statefulset.yaml
+
+# configure cluster
 kubectl exec -it redis-cluster-0 \
     -- redis-cli --cluster create \
     --cluster-replicas 1 $(kubectl get pods -l app=redis-cluster -o jsonpath='{range.items[*]}{.status.podIP}:6379 {end}')
@@ -22,8 +38,10 @@ for x in $(seq 0 5); do echo "redis-cluster-$x"; kubectl exec redis-cluster-$x -
 
 Test
 kubectl apply -f test-redis.yaml
+curl localhost:31005
 
 Destroy:
 kubectl delete -f test-redis.yaml
 kubectl delete -f statefulset.yaml
-for x in $(seq 0 5); do kubectl delete -f pvc-redis0${x}.yaml; done;
+for x in $(seq 0 5); do kubectl delete -f pvc-redis${x}.yaml; done;
+for x in $(seq 0 5); do kubectl delete -f pv-redis${x}.yaml; done;

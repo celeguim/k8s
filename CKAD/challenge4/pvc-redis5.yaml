@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redis04
+  name: redis5
+  labels:
+    app: redis5
 spec:
   storageClassName: hostpath
   accessModes:
@@ -9,3 +11,6 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  selector:
+    matchLabels:
+      app: redis5
